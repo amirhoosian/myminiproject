@@ -9,5 +9,6 @@ namespace newminiproject2.Interface
     public interface Ichat
     {
         public void Add(ChatViewModle vm);
+        public void Delete(int id);
     }
 }

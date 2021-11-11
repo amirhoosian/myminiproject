@@ -31,6 +31,12 @@ namespace newminiproject2.Controllers
         }
 
 
+        [HttpDelete("{id}")]
+        public IActionResult Deleted(int id)
+        {
+            chat.Delete(id);
+            return Ok();
+        }
 
 
 

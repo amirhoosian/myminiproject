@@ -23,7 +23,8 @@ namespace newminiproject2.Services
 
         public void Add(ChatViewModle vm)
         {
-            Chat newChat = new(){
+            Chat newChat = new()
+            {
                 SenderPageId = vm.SenderPageId,
                 ContactPageId = vm.ContactPageId
 
@@ -33,6 +34,13 @@ namespace newminiproject2.Services
             _context.SaveChanges();
 
 
+        }
+
+        public void Delete(int id)
+        {
+            _context.Messages.RemoveRange(_context.Messages.Where(x => x.ChatId == id));
+            _context.Chats.Remove(_context.Chats.FirstOrDefault(x => x.Id == id));
+            _context.SaveChanges();
         }
     }
 }
