@@ -9,7 +9,7 @@ using newminiproject2.ViewModle;
 namespace newminiproject2.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class UserController : ControllerBase
     {
         private myminiprojectContext _context;
@@ -48,6 +48,15 @@ namespace newminiproject2.Controllers
             _context.SaveChanges();
 
             return Ok(newUser);
+        }
+
+        [HttpPost]
+        public bool Login(UserViewModle vm)
+        {
+            var usr = _context.Users.SingleOrDefault(u => u.UserName == vm.UserName && u.Password == vm.Password);
+            if (usr != null)
+                return true;
+            return false;
         }
 
 
