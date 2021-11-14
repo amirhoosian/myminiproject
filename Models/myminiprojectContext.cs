@@ -25,7 +25,6 @@ namespace newminiproject2.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-
                 optionsBuilder.UseSqlServer("Server=.;Database=myminiproject;Trusted_Connection=True;");
             }
         }
@@ -65,6 +64,7 @@ namespace newminiproject2.Models
                 entity.HasOne(d => d.Chat)
                     .WithMany(p => p.Messages)
                     .HasForeignKey(d => d.ChatId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Message_User");
 
                 entity.HasOne(d => d.SenderPage)

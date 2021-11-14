@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using newminiproject2.Models;
 using newminiproject2.ViewModle;
+using Microsoft.AspNetCore.Authorization;
 
 namespace newminiproject2.Controllers
 {
@@ -96,7 +97,7 @@ namespace newminiproject2.Controllers
             if (usr != null)
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var tokenKey = Encoding.ASCII.GetBytes(Authentication(usr.UserName, usr.Password));
+                var tokenKey = Encoding.ASCII.GetBytes(Authentication(usr.UserName, usr.Password, usr.Id));
 
 
                 var tokenDescriptor = new SecurityTokenDescriptor()
@@ -105,7 +106,7 @@ namespace newminiproject2.Controllers
                         new Claim[]
                         {
                         new Claim(ClaimTypes.Name, vm.UserName)
-                        }),
+                     }),
                     Expires = DateTime.UtcNow.AddHours(1),
                     SigningCredentials = new SigningCredentials(
                         new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
@@ -123,7 +124,43 @@ namespace newminiproject2.Controllers
 
 
         }
-        private string Authentication(string username, string password)
+        // private string Authentication(string username, string password)
+        // {
+        //     if (!(username.Equals(username) || password.Equals(password)))
+        //     {
+        //         return null;
+        //     }
+
+        //     // 1. Create Security Token Handler
+        //     var tokenHandler = new JwtSecurityTokenHandler();
+
+        //     // 2. Create Private Key to Encrypted
+        //     var tokenKey = Encoding.ASCII.GetBytes("asaaaaaaaaaaaaaa");
+
+        //     //3. Create JETdescriptor
+        //     var tokenDescriptor = new SecurityTokenDescriptor()
+        //     {
+        //         Subject = new ClaimsIdentity(
+        //             new Claim[]
+        //             {
+        //                 new Claim(ClaimTypes.Name, username),
+        //                 // new Claim(ClaimTypes.NameIdentifier, userid)
+        //                 //  new Claim(ClaimTypes.NameIdentifier, User.id.Tostring())
+
+        //             }),
+        //         Expires = DateTime.UtcNow.AddHours(1),
+        //         SigningCredentials = new SigningCredentials(
+        //             new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
+        //     };
+        //     //4. Create Token
+        //     var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        //     // 5. Return Token from method
+        //     return tokenHandler.WriteToken(token);
+        // }
+
+
+        private string Authentication(string username, string password, int Id)
         {
             if (!(username.Equals(username) || password.Equals(password)))
             {
@@ -136,13 +173,23 @@ namespace newminiproject2.Controllers
             // 2. Create Private Key to Encrypted
             var tokenKey = Encoding.ASCII.GetBytes("asaaaaaaaaaaaaaa");
 
+            //Find User For Login
+            var user = _context.Users.FirstOrDefault(c => c.UserName == username);
+            if (user == null)
+            {
+                //Return Error in Api ... You Can retrun Null
+                return null;
+            }
+
             //3. Create JETdescriptor
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(
                     new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, username)
+                        new Claim(ClaimTypes.Name, username),
+                        new Claim(ClaimTypes.NameIdentifier, Id.ToString())
+
                     }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(
@@ -155,6 +202,70 @@ namespace newminiproject2.Controllers
             return tokenHandler.WriteToken(token);
         }
 
+
+        // [HttpPut]
+
+        // public IActionResult ChangePassword(UserViewModle vim)
+        // {
+        //     // var identity = HttpContext.User.Identity as ClaimsIdentity;
+        //     // if (identity != null)
+        //     // {
+        //     //     IEnumerable<Claim> claims = identity.Claims;
+        //     //     // or
+        //     //     identity.FindFirst(ClaimsType.NameIdentifire).Value;
+
+        //     // }
+        //     var userId = 0;
+        //     var identity = HttpContext.User.Identity as ClaimsIdentity;
+        //     if (identity != null)
+        //     {
+        //         userId = int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+        //     }
+        //     // //Return string
+        //     // var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        //     // var userId = int.Parse( User.FindFirst(ClaimsType.NameIdentifire));
+        //     var user = _context.Users.SingleOrDefault(c => c.Id == userId);
+
+        //     if (user.Password == vim.Password)
+        //     {
+        //         user.Password = vim.NewPassword;
+        //         _context.SaveChanges();
+
+
+        //     }
+        //     return Ok();
+        // }
+
+
+        // [Authorize]
+        [HttpPut]
+
+        public IActionResult ChangePassword(UserViewModle vim)
+        {
+            //var UserName = User.FindFirstValue(ClaimTypes.Name);
+            // var user = _context.Users.SingleOrDefault(c => c.UserName == UserName);
+            var user = _context.Users.FirstOrDefault(c => c.UserName == vim.UserName);
+
+            if (user.Password == vim.Password)
+            {
+                user.Password = vim.NewPassword;
+                _context.SaveChanges();
+
+
+            }
+            return Ok();
+        }
+
+        // [HttpPut]
+
+        // public IActionResult ChangePassword(UserViewModle vim)
+        // {
+        //     var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        //     var user = _context.Users.FirstOrDefault(c => c.Id == userId);
+        //     return Ok();
+
+
+        // }
 
 
 

@@ -11,7 +11,7 @@ namespace newminiproject2.Models
         public int? SenderPageId { get; set; }
         public string Message1 { get; set; }
         public bool? IsDeleted { get; set; }
-        public int? ChatId { get; set; }
+        public int ChatId { get; set; }
 
         public virtual User Chat { get; set; }
         public virtual Chat SenderPage { get; set; }
